@@ -1,0 +1,30 @@
+services:
+  # Banco de Dados do Order Service (Ruby on Rails)
+  orders-db:
+    image: postgres:15-alpine
+    container_name: orders-db
+    environment:
+      POSTGRES_USER: ${ORDERS_DB_USER}
+      POSTGRES_PASSWORD: ${ORDERS_DB_PASSWORD}
+      POSTGRES_DB: ${ORDERS_DB_NAME}
+    ports:
+      - "5432:5432"
+    volumes:
+      - orders_db_data:/var/lib/postgresql/data
+
+  # Banco de Dados do Payment Service (Java / Spring Boot)
+  payments-db:
+    image: postgres:15-alpine
+    container_name: payments-db
+    environment:
+      POSTGRES_USER: ${PAYMENTS_DB_USER}
+      POSTGRES_PASSWORD: ${PAYMENTS_DB_PASSWORD}
+      POSTGRES_DB: ${PAYMENTS_DB_NAME}
+    ports:
+      - "5433:5432"
+    volumes:
+      - payments_db_data:/var/lib/postgresql/data
+
+volumes:
+  orders_db_data:
+  payments_db_data:

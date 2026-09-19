@@ -1,0 +1,22 @@
+name: CI
+
+# Define quando a pipeline será executada automaticamente
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  validacao:
+    name: Validar Estrutura e Infraestrutura
+    runs-on: ubuntu-latest
+
+    steps:
+      # Passo 1: Baixa o codigo do repositorio na maquina do GitHub Actions
+      - name: Checkout do Codigo
+        uses: actions/checkout@v4
+
+      # Passo 2: Valida se o arquivo docker-compose.yml possui sintaxe correta
+      - name: Validar Arquivo Docker Compose
+        run: docker compose config
