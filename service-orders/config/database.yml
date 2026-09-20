@@ -1,0 +1,37 @@
+# PostgreSQL. Versions 9.5 and up are supported.
+
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  max_connections: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  username: <%= ENV.fetch("ORDERS_DB_USER") { "orders_user" } %>
+  password: <%= ENV.fetch("ORDERS_DB_PASSWORD") { "orders_dev_password" } %>
+  host: <%= ENV.fetch("ORDERS_DB_HOST") { "localhost" } %>
+  port: 5432
+
+development:
+  <<: *default
+  database: service_orders_development
+ 
+test:
+  <<: *default
+  database: service_orders_test
+
+production:
+  primary: &primary_production
+    <<: *default
+    database: service_orders_production
+    username: service_orders
+    password: <%= ENV["SERVICE_ORDERS_DATABASE_PASSWORD"] %>
+  cache:
+    <<: *primary_production
+    database: service_orders_production_cache
+    migrations_paths: db/cache_migrate
+  queue:
+    <<: *primary_production
+    database: service_orders_production_queue
+    migrations_paths: db/queue_migrate
+  cable:
+    <<: *primary_production
+    database: service_orders_production_cable
+    migrations_paths: db/cable_migrate
