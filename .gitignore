@@ -1,1 +1,31 @@
+# Configuração Global de Ignorados (Monorepo)
+
+# 1. Ficheiros de Variáveis de Ambiente e Segredos
 .env
+.env.*
+!.env.example
+**/config/master.key
+
+# 2. Ficheiros do Sistema Operativo e do Editor (VS Code)
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# 3. Ficheiros Temporários e Registos de Logs (Rails & Spring Boot)
+**/log/*.log
+**/tmp/
+**/storage/
+**/*.log
+
+# 4. Dependências e Compilações Locais
+**/.bundle/
+**/vendor/bundle/
+**/node_modules/
+**/target/
+**/.mvn/
+
+# 5. Bases de Dados Locais e Ficheiros de Estado
+**/*.sqlite3
+**/*.sqlite3-journal
+**/*.db
