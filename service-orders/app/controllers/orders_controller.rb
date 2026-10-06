@@ -1,11 +1,10 @@
 class OrdersController < ApplicationController
-  
   def index
     orders = Order.all
     render json: orders.to_json
   end
 
-  
+
   def show
     order = Order.find_by(id: params[:id])
 
@@ -16,15 +15,14 @@ class OrdersController < ApplicationController
     end
   end
 
-  
-  def create
-    order = Order.new(order_params)
 
-    if order.save
-      render json: order, status: :created
+  def create
+    service = Orders::CreateService.new(order_params)
+
+    if service.call
+      render json: service.order, status: :created
     else
-   
-      render json: { errors: order.errors.full_messages }, status: :unprocessable_entity
+      render json: { errors: service.errors }, status: :unprocessable_entity
     end
   end
 

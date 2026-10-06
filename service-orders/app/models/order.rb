@@ -3,6 +3,8 @@ class Order < ApplicationRecord
 
   attribute :status, :string, default: "pending"
 
+  before_validation :set_pending_status, on: :create
+
   validates :item_name, presence: { message: "é obrigatório" }
 
   validates :total_amount,
@@ -14,4 +16,10 @@ class Order < ApplicationRecord
   validates :status,
             presence: true,
             inclusion: { in: STATUSES }
+
+  private 
+
+  def set_pending_status
+    self.status = "pending"
+  end
 end
