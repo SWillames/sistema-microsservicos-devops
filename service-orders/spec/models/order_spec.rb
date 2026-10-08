@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe Order, type: :model do
   context 'atribuicao de atributos padrao' do
-    it 'define o status inicial como pending automaticamente' do 
+    it 'define o status inicial como pending automaticamente' do
       order = Order.new(item_name: 'Cadeira Gamer', total_amount: 500.00)
       expect(order.status).to eq('pending')
     end
@@ -10,10 +10,6 @@ RSpec.describe Order, type: :model do
     it 'forca o status para pending mesmo se enviado paid na criacao' do
       order = Order.create(item_name: 'Cadeira Gamer', total_amount: 500.00, status: 'paid')
       expect(order.status).to eq('pending')
-    end
-
-    it 'valida o bloqueio da CI ao falhar um teste' do
-      expect(1 + 1).to eq(3)
     end
   end
 
