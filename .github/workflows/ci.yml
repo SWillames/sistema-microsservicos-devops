@@ -3,7 +3,7 @@ name: CI
 # Define quando a pipeline será executada automaticamente
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "ci/*", "feature/*" ]
   pull_request:
     branches: [ "main" ]
 
@@ -20,3 +20,48 @@ jobs:
       # Passo 2: Valida se o arquivo docker-compose.yml possui sintaxe correta
       - name: Validar Arquivo Docker Compose
         run: docker compose config
+        
+  testar-order-service:
+    name: Testar Order Service
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: ${{ secrets.ORDERS_DB_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.ORDERS_DB_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.ORDERS_DB_NAME }}
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    defaults:
+      run:
+        working-directory: service-orders
+
+    env:
+      RAILS_ENV: test
+      DATABASE_URL: postgres://${{ secrets.ODERS_DB_USER }}:${{ secrets.ORDERS_DB_PASSWORD}}@localhost:5432/${{ secrets.ORDERS_DB_NAME }}
+
+    steps:
+      - name: Checkout do Codigo
+        uses: actions/checkout@v4
+
+      - name: Configurar Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          working-directory: service-orders
+          bundler-cache: true
+
+      - name: Preparar Banco de Dados
+        run: |
+          bundle exec rails db:create
+          bundle exec rails db:schema:load
+      
+      - name: Executar Testes RSpec
+        run: bundle exec rspec
