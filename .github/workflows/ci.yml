@@ -3,7 +3,7 @@ name: CI
 # Define quando a pipeline será executada automaticamente
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "ci/*", "feature/*" ]
   pull_request:
     branches: [ "main" ]
 
@@ -25,6 +25,29 @@ jobs:
     name: Testar Order Service
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgre:15-alpine
+        env:
+          POSTGRES_USER: ${{ secrets.ORDERS_DB_USERS }}
+          POSTGRES_PASSWORD: ${{ secrets.ORDERS_DB_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.ORDERS_DB_NAME }}
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    defaults:
+      run:
+        working-directory: service-orders
+
+    env:
+      RAILS_ENV: test
+      DATABASE_URL: postgres://${{ secrets.ODERS_DB_USER }}:${{ secrets.ORDERS_DB_PASSWORD}}@localhost:5432/${{ secrets.ORDERS_DB_NAME }}
+
     steps:
       - name: Checkout do Codigo
         uses: actions/checkout@v4
@@ -34,3 +57,11 @@ jobs:
         with:
           working-directory: service-orders
           bundle-cache: true
+
+      - name: Preparar Banco de Dados
+        run: |
+          bundle exec rails db:create
+          bundle exec rails db:schema:load
+      
+      - name: Executar Testes RSpec
+        run: bundle exec rspec
