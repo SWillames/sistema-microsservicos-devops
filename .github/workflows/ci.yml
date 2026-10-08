@@ -20,3 +20,17 @@ jobs:
       # Passo 2: Valida se o arquivo docker-compose.yml possui sintaxe correta
       - name: Validar Arquivo Docker Compose
         run: docker compose config
+        
+  testar-order-service:
+    name: Testar Order Service
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do Codigo
+        uses: actions/checkout@v4
+
+      - name: Configurar Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          working-directory: service-orders
+          bundle-cache: true
