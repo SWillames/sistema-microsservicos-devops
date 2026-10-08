@@ -11,6 +11,10 @@ RSpec.describe Order, type: :model do
       order = Order.create(item_name: 'Cadeira Gamer', total_amount: 500.00, status: 'paid')
       expect(order.status).to eq('pending')
     end
+
+    it 'valida o bloqueio da CI ao falhar um teste' do
+      expect(1 + 1).to eq(3)
+    end
   end
 
   context 'validacoes' do
