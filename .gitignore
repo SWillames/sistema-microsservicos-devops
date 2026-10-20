@@ -11,6 +11,8 @@
 Thumbs.db
 .vscode/
 .idea/
+*.swp
+*.swo
 
 # 3. Ficheiros Temporários e Registos de Logs (Rails & Spring Boot)
 **/log/*.log
@@ -23,7 +25,6 @@ Thumbs.db
 **/vendor/bundle/
 **/node_modules/
 **/target/
-**/.mvn/
 
 # 5. Bases de Dados Locais e Ficheiros de Estado
 **/*.sqlite3
@@ -31,3 +32,10 @@ Thumbs.db
 **/*.db
 **/coverage/
 coverage/
+
+**/target/
+!**/src/main/webapp/WEB-INF/lib/*.jar
+!**/src/test/resources/
+
+# Arquivos temporários do Maven
+.mvn/timing.properties

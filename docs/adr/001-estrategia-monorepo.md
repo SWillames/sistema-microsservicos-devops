@@ -24,6 +24,11 @@ infraestrutura local e documentação no mesmo repositório.
 Cada serviço continuará possuindo ciclo próprio de desenvolvimento,
 build e testes, apesar de compartilhar o mesmo repositório.
 
+O compartilhamento do repositório não implica compartilhamento da
+implementação interna ou do acesso direto aos dados de outros serviços.
+A integração deverá ocorrer por meio de contratos e interfaces
+explicitamente definidos.
+
 ## Consequências
 
 ### Positivas
