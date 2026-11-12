@@ -1,21 +1,26 @@
 module Orders
   class CreateService
-    attr_reader :params, :order, :errors
+    Result = Data.define(:order, :errors) do
+      def success?
+        errors.empty?
+      end
+    end
+
+    def self.call(params)
+      new(params).call
+    end
 
     def initialize(params)
-      @params = params.to_h.symbolize_keys
-      @errors = []
+      @params = params
     end
 
     def call
-      payload = params.merge(status: "pending")
-      @order = Order.new(payload)
+      order = Order.new(@params)
 
-      if @order.save
-        true
+      if order.save
+        Result.new(order: order, errors: [])
       else
-        @errors = @order.errors.full_messages
-        false
+        Result.new(order: order, errors: order.errors.full_messages)
       end
     end
   end
