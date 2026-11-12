@@ -22,7 +22,7 @@ RSpec.describe Orders::CreateService do
     context "com parametros sao invalidos" do
       it "nao cria o pedido e retorna a lista de erros" do
         service = described_class.call(item_name: "", total_amount: -100.00)
-        
+
         expect(service).not_to be_success
         expect(service.order).not_to be_persisted
         expect(service.errors).to include(
