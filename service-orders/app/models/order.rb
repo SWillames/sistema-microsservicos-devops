@@ -1,5 +1,5 @@
 class Order < ApplicationRecord
-  STATUSES = %w[pending processing paid failed].freeze
+  STATUSES = %w[ pending processing paid failed ].freeze
 
   attribute :status, :string, default: "pending"
 
@@ -10,16 +10,15 @@ class Order < ApplicationRecord
   validates :total_amount,
             presence: { message: "é obrigatório" },
             numericality: {
-              greater_than: 0, message: "deve ser maior que zero"
+              greater_than: 0, allow_nil: true, message: "deve ser maior que zero"
             }
 
   validates :status,
             presence: true,
             inclusion: { in: STATUSES }
 
-  private 
-
-  def set_pending_status
-    self.status = "pending"
-  end
+  private
+    def set_pending_status
+      self.status = "pending"
+    end
 end
