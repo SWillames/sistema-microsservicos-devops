@@ -4,26 +4,36 @@ services:
     image: postgres:15-alpine
     container_name: orders-db
     environment:
-      POSTGRES_USER: ${ORDERS_DB_USER}
-      POSTGRES_PASSWORD: ${ORDERS_DB_PASSWORD}
-      POSTGRES_DB: ${ORDERS_DB_NAME}
+      POSTGRES_USER: ${ORDERS_DB_USER:?defina ORDERS_DB_USER no arquivo .env}
+      POSTGRES_PASSWORD: ${ORDERS_DB_PASSWORD:?defina ORDERS_DB_PASSWORD no arquivo .env}
+      POSTGRES_DB: ${ORDERS_DB_NAME:?defina ORDERS_DB_NAME no arquivo .env}
     ports:
       - "5432:5432"
     volumes:
       - orders_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   # Banco de Dados do Payment Service (Java / Spring Boot)
   payments-db:
     image: postgres:15-alpine
     container_name: payments-db
     environment:
-      POSTGRES_USER: ${PAYMENTS_DB_USER}
-      POSTGRES_PASSWORD: ${PAYMENTS_DB_PASSWORD}
-      POSTGRES_DB: ${PAYMENTS_DB_NAME}
+      POSTGRES_USER: ${PAYMENTS_DB_USER:?defina PAYMENTS_DB_USER no arquivo .env}
+      POSTGRES_PASSWORD: ${PAYMENTS_DB_PASSWORD:?defina PAYMENTS_DB_PASSWORD no arquivo .env}
+      POSTGRES_DB: ${PAYMENTS_DB_NAME:?defina PAYMENTS_DB_NAME no arquivo .env}
     ports:
       - "5433:5432"
     volumes:
       - payments_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
 volumes:
   orders_db_data:
