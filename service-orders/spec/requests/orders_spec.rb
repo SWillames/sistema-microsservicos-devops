@@ -59,7 +59,6 @@ RSpec.describe "Orders API", type: :request do
       payload_invalido = { order: { item_name: "", total_amount: -10.00 } }
 
       expect { post "/orders", params: payload_invalido, as: :json }.not_to change(Order, :count)
-      puts response.parsed_body
 
       expect(response).to have_http_status(:unprocessable_content)
       expect(response.parsed_body["errors"]).to include(

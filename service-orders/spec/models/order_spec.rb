@@ -53,4 +53,18 @@ RSpec.describe Order, type: :model do
       end
     end
   end
+
+  describe "constraints do banco" do
+    it "rejeita item_name nulo mesmo sem passar pelas validações" do
+      order.item_name = nil
+
+      expect { order.save!(validate: false) }.to raise_error(ActiveRecord::NotNullViolation)
+    end
+
+    it "rejeita total_amount menor ou igual a zero mesmo sem passar pelas validações" do
+      order.total_amount = 0
+
+      expect { order.save!(validate: false) }.to raise_error(ActiveRecord::StatementInvalid)
+    end
+  end
 end
