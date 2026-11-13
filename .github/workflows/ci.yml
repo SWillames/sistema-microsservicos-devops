@@ -30,7 +30,54 @@ jobs:
         run: cp .env.example .env
 
       - name: Validar Arquivo Docker Compose
-        run: docker compose config
+        run: docker compose config --quiet
+
+  order-service-lint:
+    name: Order Service / Estilo (Rubocop)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    defaults:
+      run:
+        working-directory: service-orders
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Configurar Ruby
+        uses: ruby/setup-ruby@v1
+        with: 
+          working-directory: service-orders
+          bundler-cache: true
+
+      - name: Executar Rubocop
+        run: bin/rubocop -f github
+
+  order-service-seguranca:
+    name: Order Service / Segurança (Brakeman e bundler-audit)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    defaults:
+      run:
+        working-directory: service-orders
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Configurar Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          working-directory: service-orders
+          bundler-cache: true
+
+      - name: Análise estática com Brakeman
+        run: bin/brakeman --no-pager
+
+      - name: Auditoria de dependências
+        run: bin/bundler-audit
         
   testar-order-service:
     name: Testar Order Service
