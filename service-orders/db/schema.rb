@@ -10,15 +10,16 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_09_20_142900) do
+ActiveRecord::Schema[8.0].define(version: 2026_11_13_015604) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
   create_table "orders", force: :cascade do |t|
-    t.string "item_name"
-    t.decimal "total_amount"
-    t.string "status"
+    t.string "item_name", null: false
+    t.decimal "total_amount", precision: 12, scale: 2, null: false
+    t.string "status", default: "pending", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.check_constraint "total_amount > 0::numeric", name: "orders_total_amount_positive"
   end
 end
