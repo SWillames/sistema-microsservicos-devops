@@ -3,14 +3,22 @@ name: CI
 # Define quando a pipeline será executada automaticamente
 on:
   push:
-    branches: [ "main", "ci/*", "feature/*" ]
+    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   validacao:
     name: Validar Estrutura e Infraestrutura
     runs-on: ubuntu-latest
+    timeout-minutes: 5
 
     steps:
       # Passo 1: Baixa o codigo do repositorio na maquina do GitHub Actions
@@ -18,12 +26,16 @@ jobs:
         uses: actions/checkout@v4
 
       # Passo 2: Valida se o arquivo docker-compose.yml possui sintaxe correta
+      - name: Preparar variáveis de ambiente
+        run: cp .env.example .env
+
       - name: Validar Arquivo Docker Compose
         run: docker compose config
         
   testar-order-service:
     name: Testar Order Service
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     services:
       postgres:
@@ -31,14 +43,14 @@ jobs:
         env:
           POSTGRES_USER: ${{ secrets.ORDERS_DB_USER }}
           POSTGRES_PASSWORD: ${{ secrets.ORDERS_DB_PASSWORD }}
-          POSTGRES_DB: ${{ secrets.ORDERS_DB_NAME }}
+          
         ports:
           - 5432:5432
         options: >-
           --health-cmd pg_isready
-          --health-interval 10s
+          --health-interval 5s
           --health-timeout 5s
-          --health-retries 5
+          --health-retries 10
 
     defaults:
       run:
@@ -46,11 +58,25 @@ jobs:
 
     env:
       RAILS_ENV: test
-      DATABASE_URL: postgres://${{ secrets.ODERS_DB_USER }}:${{ secrets.ORDERS_DB_PASSWORD}}@localhost:5432/${{ secrets.ORDERS_DB_NAME }}
+      ORDERS_DB_HOST: localhost
+      ORDERS_DB_USER: ${{ secrets.ORDERS_DB_USER }}
+      ORDERS_DB_PASSWORD: ${{ secrets.ORDERS_DB_PASSWORD }}
+      
 
     steps:
       - name: Checkout do Codigo
         uses: actions/checkout@v4
+
+      - name: Verificar secrets
+        run: |
+          if [ -z "$ORDERS_DB_USER" ]; then
+            echo "::error::Secret ORDERS_DB_USER não configurado no repositório"
+            exit 1
+          fi
+          if [ -z "$ORDERS_DB_PASSWORD" ]; then
+            echo "::error::Secret ORDERS_DB_PASSWORD não configurado no repositório"
+            exit 1
+          fi
 
       - name: Configurar Ruby
         uses: ruby/setup-ruby@v1
@@ -65,3 +91,11 @@ jobs:
       
       - name: Executar Testes RSpec
         run: bundle exec rspec
+
+      - name: Publicar relatório de cobertura
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cobertura-order-service
+          path: service-orders/coverage
+          if-no-files-found: ignore
